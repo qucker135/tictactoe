@@ -1,15 +1,17 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <img alt="Vue logo" src="./assets/cross.png" class="header-pics">
+  <img alt="Vue logo" src="./assets/nough.png" class="header-pics">
+  <h1>Tic-tac-toe</h1>
+  <GamePanel />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import GamePanel from './components/GamePanel.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    GamePanel
   }
 }
 </script>
@@ -20,7 +22,13 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #fff;
   margin-top: 60px;
+}
+.header-pics {
+  width: 100px;
+  height: auto;
+  margin-left:10px;
+  margin-right: 10px;
 }
 </style>
