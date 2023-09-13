@@ -1,7 +1,7 @@
 <template>
   <div class="panel">
     <div class="controls">
-      <select name="modes" id="modes" v-model="selGameMode" @change="debugSelected">
+      <select name="modes" id="modes" v-model="selGameMode">
         <option value="0" hidden>Choose Game Mode</option>
         <option value="1">2 players</option>
         <option value="2">Player vs AI (player starts)</option>
@@ -171,10 +171,6 @@ export default {
         return require('@/assets/nough.png');
       }
     },
-    debugSelected() {
-      console.log(this.selGameMode);
-      console.log(this.gameMode);
-    }
   }
 }
 </script>
