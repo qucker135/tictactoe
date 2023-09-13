@@ -9,9 +9,9 @@
       </select>
     </div>
     <div class="controls">
-      <button type="button" @click="resetGame" :disabled="selGameMode===0">New Game</button>
+      <button type="button" @click="resetGame" :disabled="selGameMode==='0'">New Game</button>
     </div>
-    <div class="game-board">
+    <div class="game-board" v-if="gameMode!=='0'">
       <div class="game-row">
         <div class="game-cell" @click="makeMove(0, 0)">
           <img v-if="['x', 'o'].includes(gameBoard[0][0])" :src="getPhoto(0, 0)"/>
@@ -46,6 +46,42 @@
         </div>
       </div>
     </div>
+    <div class="legend">
+      <div class="legend-option" v-if="gameMode==='1'">
+        <div class="legend-option-row">
+          <img src="@/assets/cross.png" alt="cross" width="30"/>
+          <span> - Player 1</span>
+        </div>
+        <div class="legend-option-row">
+          <img src="@/assets/nough.png" alt="nough" width="30"/>
+          <span> - Player 2</span>
+        </div>
+      </div>
+      <div class="legend-option" v-if="gameMode==='2'">
+        <div class="legend-option-row">
+          <img src="@/assets/cross.png" alt="cross" width="30"/>
+          <span> - Player</span>
+        </div>
+        <div class="legend-option-row">
+          <img src="@/assets/nough.png" alt="nough" width="30"/>
+          <span> - AI</span>
+        </div>
+      </div>
+      <div class="legend-option" v-if="gameMode==='3'">
+        <div class="legend-option-row">
+          <img src="@/assets/cross.png" alt="cross" width="30"/>
+          <span> - AI</span>
+        </div>
+        <div class="legend-option-row">
+          <img src="@/assets/nough.png" alt="nough" width="30"/>
+          <span> - Player</span>
+        </div>
+      </div>
+    </div>
+    <div class="turn" v-if="gameMode!=='0'">
+      <span>Turn:</span>
+      <img :src="whoseRound==='x' ? require('@/assets/cross.png') : require('@/assets/nough.png')" width="50"/>
+    </div>
   </div>
 </template>
 
@@ -54,22 +90,62 @@ export default {
   name: 'GamePanel',
   data() {
     return {
-      selGameMode: 0,
-      gameMode: 0,
+      selGameMode: "0",
+      gameMode: "0",
       whoseRound: 'x',
       gameBoard: [
         ['', '', ''],
         ['', '', ''],
         ['', '', '']
       ],
+      gameOn: true
     }
   },
   methods: {
     makeMove(row, col) {
-      if (this.gameBoard[row][col] === '') {
+      if (this.gameBoard[row][col] === '' && this.gameOn) {
         this.gameBoard[row][col] = this.whoseRound
         this.whoseRound = this.whoseRound === 'x' ? 'o' : 'x'
       }
+      // check if game is over
+      if (this.checkIfGameOver()) {
+        this.gameOn = false;
+      }
+    },
+    checkIfGameOver() {
+      return this.checkIfWin() || this.checkIfDraw();
+    },
+    checkIfWin() {
+      // check rows
+      for (let i = 0; i < 3; i++) {
+        if (this.gameBoard[i][0] === this.gameBoard[i][1] && this.gameBoard[i][1] === this.gameBoard[i][2] && this.gameBoard[i][0] !== '') {
+          return true;
+        }
+      }
+      // check columns
+      for (let i = 0; i < 3; i++) {
+        if (this.gameBoard[0][i] === this.gameBoard[1][i] && this.gameBoard[1][i] === this.gameBoard[2][i] && this.gameBoard[0][i] !== '') {
+          return true;
+        }
+      }
+      // check diagonals
+      if (this.gameBoard[0][0] === this.gameBoard[1][1] && this.gameBoard[1][1] === this.gameBoard[2][2] && this.gameBoard[0][0] !== '') {
+        return true;
+      }
+      if (this.gameBoard[0][2] === this.gameBoard[1][1] && this.gameBoard[1][1] === this.gameBoard[2][0] && this.gameBoard[0][2] !== '') {
+        return true;
+      }
+      return false;
+    },
+    checkIfDraw() {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (this.gameBoard[i][j] === '') {
+            return false;
+          }
+        }
+      }
+      return true;
     },
     resetGame() {
       this.gameBoard = [
@@ -79,6 +155,7 @@ export default {
       ];
       this.whoseRound = 'x';
       this.gameMode = this.selGameMode;
+      this.gameOn = true;
     },
     getPhoto(row, col) {
       if (this.gameBoard[row][col] === 'x') {
@@ -124,5 +201,21 @@ export default {
   .game-cell img{
     width: 100px;
     height: auto;
+  }
+  .legend-option-row {
+    margin-bottom: 5px;
+  }
+  .legend-option-row img,
+  .legend-option-row span,
+  .turn span,
+  .turn img {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .legend-option-row img {
+    margin-right: 5px;
+  }
+  .turn img{
+    margin-left: 5px;
   }
 </style>
