@@ -103,39 +103,45 @@ export default {
   },
   methods: {
     makeMove(row, col) {
-      if (this.gameBoard[row][col] === '' && this.gameOn) {
-        this.gameBoard[row][col] = this.whoseRound
-        this.whoseRound = this.whoseRound === 'x' ? 'o' : 'x'
-      }
-      // check if game is over
-      if (this.checkIfGameOver()) {
-        this.gameOn = false;
+      if(this.gameOn) {
+        if (this.gameBoard[row][col] === '') {
+          this.gameBoard[row][col] = this.whoseRound
+          this.whoseRound = this.whoseRound === 'x' ? 'o' : 'x'
+        }
+        // check if game is over
+        if (this.checkIfGameOver()) {
+          this.gameOn = false;
+        }
       }
     },
     checkIfGameOver() {
       return this.checkIfWin() || this.checkIfDraw();
     },
     checkIfWin() {
+      let result = false;
       // check rows
       for (let i = 0; i < 3; i++) {
         if (this.gameBoard[i][0] === this.gameBoard[i][1] && this.gameBoard[i][1] === this.gameBoard[i][2] && this.gameBoard[i][0] !== '') {
-          return true;
+          result = true;
         }
       }
       // check columns
       for (let i = 0; i < 3; i++) {
         if (this.gameBoard[0][i] === this.gameBoard[1][i] && this.gameBoard[1][i] === this.gameBoard[2][i] && this.gameBoard[0][i] !== '') {
-          return true;
+          result = true;
         }
       }
       // check diagonals
       if (this.gameBoard[0][0] === this.gameBoard[1][1] && this.gameBoard[1][1] === this.gameBoard[2][2] && this.gameBoard[0][0] !== '') {
-        return true;
+        result = true;
       }
       if (this.gameBoard[0][2] === this.gameBoard[1][1] && this.gameBoard[1][1] === this.gameBoard[2][0] && this.gameBoard[0][2] !== '') {
-        return true;
+        result = true;
       }
-      return false;
+      if(result) {
+        alert("Player " + (this.whoseRound === 'x' ? 'o' : 'x') + " won!");
+      }
+      return result;
     },
     checkIfDraw() {
       for (let i = 0; i < 3; i++) {
@@ -145,6 +151,7 @@ export default {
           }
         }
       }
+      alert('Draw!');
       return true;
     },
     resetGame() {
