@@ -112,6 +112,145 @@ export default {
         if (this.checkIfGameOver()) {
           this.gameOn = false;
         }
+        // AI move
+        if(this.gameMode !== '1' && this.gameOn) {
+          const [row, col] = this.AIminimax(this.gameBoard, this.whoseRound);
+          this.makeAIMove(row, col, this.whoseRound);
+          this.whoseRound = this.whoseRound === 'x' ? 'o' : 'x';
+          // check if game is over
+          if (this.checkIfGameOver()) {
+            this.gameOn = false;
+          }
+          else{
+            const [row, col, bestMove] = this.AIminimax(this.gameBoard, this.whoseRound);
+            console.log("Best move for you: ", row, col, bestMove);
+          }
+        }
+      }
+    },
+    AIminimax(gameBoard, whoseRound, logging = true) {
+      if(logging) {
+        console.log("Info from AI: ", gameBoard, whoseRound);
+      }
+      // check if x won
+      let xwon = false;
+      for(let i = 0; i < 3; i++) {
+        if(gameBoard[i][0] === 'x' && gameBoard[i][1] === 'x' && gameBoard[i][2] === 'x') {
+          xwon = true;
+        }
+        if(gameBoard[0][i] === 'x' && gameBoard[1][i] === 'x' && gameBoard[2][i] === 'x') {
+          xwon = true;
+        }
+      }
+      if(gameBoard[0][0] === 'x' && gameBoard[1][1] === 'x' && gameBoard[2][2] === 'x') {
+        xwon = true;
+      }
+      if(gameBoard[0][2] === 'x' && gameBoard[1][1] === 'x' && gameBoard[2][0] === 'x') {
+        xwon = true;
+      }
+      if (xwon) {
+        if(logging) {
+          console.log(-1);
+          console.log("x won");
+        }
+        return [-1, -1, 1];
+      }
+      // check if o won
+      let owon = false;
+      for(let i = 0; i < 3; i++) {
+        if(gameBoard[i][0] === 'o' && gameBoard[i][1] === 'o' && gameBoard[i][2] === 'o') {
+          owon = true;
+        }
+        if(gameBoard[0][i] === 'o' && gameBoard[1][i] === 'o' && gameBoard[2][i] === 'o') {
+          owon = true;
+        }
+      }
+      if(gameBoard[0][0] === 'o' && gameBoard[1][1] === 'o' && gameBoard[2][2] === 'o') {
+        owon = true;
+      }
+      if(gameBoard[0][2] === 'o' && gameBoard[1][1] === 'o' && gameBoard[2][0] === 'o') {
+        owon = true;
+      }
+      if (owon) {
+        if(logging) {
+          console.log(-1);
+          console.log("o won");
+        }
+        return [-1, -1, -1];
+      }
+      // check if draw
+      let draw = true;
+      for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 3; j++) {
+          if(gameBoard[i][j] === '') {
+            draw = false;
+          }
+        }
+      }
+      if(draw) {
+        if(logging) {
+          console.log(0);
+          console.log("draw");
+        }
+        return [-1, -1, 0];
+      }
+      // check if game is not over
+      let moves = [];
+      for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 3; j++) {
+          if(gameBoard[i][j] === '') {
+            moves.push([i, j]);
+          }
+        }
+      }
+      if(whoseRound === 'x') {
+        let bestScore = -Infinity;
+        let bestMove = [-1, -1];
+        for(let i = 0; i < moves.length; i++) {
+          if(bestScore >= 1) {
+            break;
+          }
+          const [row, col] = moves[i];
+          gameBoard[row][col] = 'x';
+          const score = this.AIminimax(gameBoard, 'o', false)[2];
+          gameBoard[row][col] = '';
+          if(score > bestScore) {
+            bestScore = score;
+            bestMove = [row, col];
+          }
+        }
+        if(logging) {
+          console.log("Best move (x): ", bestMove);
+          console.log("Best score (x): ", bestScore);
+        }
+        return [...bestMove, bestScore];
+      }
+      if(whoseRound === 'o') {
+        let bestScore = Infinity;
+        let bestMove = [-1, -1];
+        for(let i = 0; i < moves.length; i++) {
+          if(bestScore <= -1) {
+            break;
+          }
+          const [row, col] = moves[i];
+          gameBoard[row][col] = 'o';
+          const score = this.AIminimax(gameBoard, 'x', false)[2];
+          gameBoard[row][col] = '';
+          if(score < bestScore) {
+            bestScore = score;
+            bestMove = [row, col];
+          }
+        }
+        if(logging) {
+          console.log("Best move (o): ", bestMove);
+          console.log("Best score (o): ", bestScore);
+        }
+        return [...bestMove, bestScore];
+      }
+    },
+    makeAIMove(row, col, whoseRound) {
+      if (this.gameBoard[row][col] === '') {
+        this.gameBoard[row][col] = whoseRound;
       }
     },
     checkIfGameOver() {
@@ -163,6 +302,15 @@ export default {
       this.whoseRound = 'x';
       this.gameMode = this.selGameMode;
       this.gameOn = true;
+      if(this.gameMode === '3') {
+        const [row, col] = this.AIminimax(this.gameBoard, this.whoseRound);
+        this.makeAIMove(row, col, this.whoseRound);
+        this.whoseRound = 'o';
+      }
+      if(this.gameMode !== '1') {
+        const [row, col, bestMove] = this.AIminimax(this.gameBoard, this.whoseRound);
+        console.log("Best move for you: ", row, col, bestMove);
+      }
     },
     getPhoto(row, col) {
       if (this.gameBoard[row][col] === 'x') {
